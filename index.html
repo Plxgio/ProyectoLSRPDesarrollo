@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto LS Roleplay - Panel de Equipo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a192f;
+            color: #e6f1ff;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(28, 58, 112, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(28, 58, 112, 0.3) 0%, transparent 20%);
+            position: relative;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #64ffda;
+            text-shadow: 0 0 20px rgba(100, 255, 218, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .project-subtitle {
+            font-size: 1rem;
+            color: #8892b0;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .acrylic-window {
+            background: rgba(17, 34, 64, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .window-header {
+            background: rgba(23, 42, 70, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .watermark-logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .watermark-logo .logo {
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #64ffda;
+            font-size: 12rem;
+            border: none;
+            overflow: hidden;
+        }
+
+        .watermark-logo .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: brightness(0.8);
+        }
+
+        .logo-container {
+            display: none;
+        }
+
+        .project-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #64ffda;
+            margin-left: 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64ffda, #00a8cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #0a192f;
+            object-fit: cover;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #64ffda, #00a8cc);
+            color: #0a192f;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
+        }
+
+        .window-content {
+            padding: 25px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #64ffda;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: rgba(100, 255, 218, 0.3);
+        }
+
+        .task-list {
+            list-style-type: none;
+        }
+
+        .task-item {
+            padding: 15px;
+            background: rgba(23, 42, 70, 0.5);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(23, 42, 70, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-assignee {
+            font-size: 14px;
+            color: #8892b0;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6f1ff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .admin-card {
+            background: rgba(23, 42, 70, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-edit {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #8892b0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-edit:hover {
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .admin-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #64ffda, #00a8cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #0a192f;
+            font-size: 20px;
+            margin-right: 15px;
+            object-fit: cover;
+            cursor: pointer;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .admin-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .admin-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #64ffda;
+        }
+
+        .admin-role {
+            font-size: 14px;
+            color: #8892b0;
+        }
+
+        .admin-skills {
+            margin-top: 15px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Panel Personal */
+        .personal-panel {
+            height: fit-content;
+        }
+
+        .personal-tasks {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .personal-tasks::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .personal-tasks::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .personal-tasks::-webkit-scrollbar-thumb {
+            background: #64ffda;
+            border-radius: 3px;
+        }
+
+        /* Área de Comentarios */
+        .comments-section {
+            margin-top: 30px;
+        }
+
+        .comment-item {
+            padding: 15px;
+            background: rgba(23, 42, 70, 0.5);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-item:hover {
+            background: rgba(23, 42, 70, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #64ffda;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: #8892b0;
+        }
+
+        .comment-content {
+            color: #e6f1ff;
+            line-height: 1.5;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(23, 42, 70, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e6f1ff;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #64ffda;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 25, 47, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(17, 34, 64, 0.9);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #64ffda;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #8892b0;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #64ffda;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccd6f6;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(23, 42, 70, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #e6f1ff;
+            font-size: 16px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #64ffda;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #64ffda, #00a8cc);
+            color: #0a192f;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
+        }
+
+        .password-display {
+            background: rgba(23, 42, 70, 0.7);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            background: linear-gradient(135deg, #64ffda, #00a8cc);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .logo-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            background: transparent;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            text-align: center;
+            background: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: rgba(100, 255, 218, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #64ffda;
+            border-bottom: 2px solid #64ffda;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8892b0;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #64ffda;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .personal-panel {
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+
+            .watermark-logo .logo {
+                width: 600px;
+                height: 600px;
+                font-size: 8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .window-content {
+                padding: 15px;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-actions {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+
+            .project-title {
+                font-size: 1.8rem;
+            }
+
+            .watermark-logo .logo {
+                width: 400px;
+                height: 400px;
+                font-size: 5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo como marca de agua -->
+    <div class="watermark-logo">
+        <div class="logo" id="watermarkLogo">
+            <span>LS</span>
+        </div>
+    </div>
+
+    <!-- Encabezado de la página -->
+    <div class="page-header">
+        <h1 class="project-title">Proyecto LS Roleplay</h1>
+        <div class="project-subtitle">Panel de Desarrollo</div>
+    </div>
+
+    <div class="container">
+        <!-- Panel Personal -->
+        <div class="acrylic-window personal-panel">
+            <div class="window-header">
+                <h3>Lo que tengo que hacer</h3>
+            </div>
+            <div class="window-content">
+                <div class="personal-tasks" id="personalTasks">
+                    <!-- Las tareas personales se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="acrylic-window main-content">
+            <div class="window-header">
+                <div class="header-left">
+                    <h1 class="project-name" id="projectName">LS Roleplay</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <span id="userName">Usuario</span>
+                    </div>
+                    <button class="login-btn" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="tabs">
+                    <div class="tab active" data-tab="tasks">Tareas del Proyecto</div>
+                    <div class="tab" data-tab="admins">Desarrolladores</div>
+                </div>
+                
+                <div class="tab-content active" id="tasks-tab">
+                    <div class="section">
+                        <h2 class="section-title">
+                            Lista de Tareas
+                            <button class="add-btn" id="addTaskBtn">
+                                <i class="fas fa-plus"></i> Nueva Tarea
+                            </button>
+                        </h2>
+                        <ul class="task-list" id="taskList">
+                            <!-- Las tareas se cargarán dinámicamente aquí -->
+                        </ul>
+                    </div>
+
+                    <div class="section comments-section">
+                        <h2 class="section-title">
+                            Observaciones
+                            <button class="add-btn" id="addCommentBtn">
+                                <i class="fas fa-plus"></i> Nuevo Comentario
+                            </button>
+                        </h2>
+                        <div id="commentsList">
+                            <!-- Los comentarios se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="admins-tab">
+                    <div class="section">
+                        <h2 class="section-title">Desarrolladores</h2>
+                        <div class="admin-grid" id="adminGrid">
+                            <!-- Los administradores se cargarán dinámicamente aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Login -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Iniciar Sesión</h2>
+                <button class="close-btn" id="closeLoginModal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="adminSelect">Selecciona tu perfil:</label>
+                    <select class="form-select" id="adminSelect">
+                        <option value="">-- Selecciona un administrador --</option>
+                        <!-- Las opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Contraseña:</label>
+                    <input type="password" class="form-input" id="password" required>
+                </div>
+                <button type="submit" class="submit-btn">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Nueva Tarea -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Tarea</h2>
+                <button class="close-btn" id="closeTaskModal">&times;</button>
+            </div>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label class="form-label" for="taskTitle">Título de la tarea:</label>
+                    <input type="text" class="form-input" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="taskDescription">Descripción:</label>
+                    <textarea class="form-input" id="taskDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="taskAssignee">Asignar a:</label>
+                    <select class="form-select" id="taskAssignee">
+                        <option value="">-- Sin asignar --</option>
+                        <!-- Las opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Crear Tarea</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Nuevo Comentario -->
+    <div class="modal" id="commentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Comentario</h2>
+                <button class="close-btn" id="closeCommentModal">&times;</button>
+            </div>
+            <form id="commentForm">
+                <div class="form-group">
+                    <label class="form-label" for="commentContent">Comentario:</label>
+                    <textarea class="comment-input" id="commentContent" placeholder="Escribe tus observaciones, problemas o comentarios aquí..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Publicar Comentario</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edición de Administrador -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Editar Perfil</h2>
+                <button class="close-btn" id="closeAdminModal">&times;</button>
+            </div>
+            <form id="adminForm">
+                <input type="hidden" id="editAdminId">
+                <div class="form-group">
+                    <div id="adminAvatarPreview" class="avatar-preview"></div>
+                    <input type="file" id="adminAvatarInput" class="file-input" accept="image/*">
+                    <label for="adminAvatarInput" class="file-label">Cambiar foto de perfil</label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editAdminName">Nombre:</label>
+                    <input type="text" class="form-input" id="editAdminName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editAdminRole">Rol:</label>
+                    <input type="text" class="form-input" id="editAdminRole" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editAdminBio">Descripción:</label>
+                    <textarea class="form-input" id="editAdminBio" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editAdminSkills">Habilidades (separadas por comas):</label>
+                    <input type="text" class="form-input" id="editAdminSkills" placeholder="Ej: Programación, Diseño, Audio">
+                </div>
+                <button type="submit" class="submit-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cambio de Logo -->
+    <div class="modal" id="logoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Cambiar Logo del Proyecto</h2>
+                <button class="close-btn" id="closeLogoModal">&times;</button>
+            </div>
+            <form id="logoForm">
+                <div class="form-group">
+                    <div id="logoPreview" class="logo-preview">
+                        <span>LS</span>
+                    </div>
+                    <input type="file" id="logoInput" class="file-input" accept="image/*">
+                    <label for="logoInput" class="file-label">Seleccionar nueva imagen</label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectNameInput">Nombre del proyecto:</label>
+                    <input type="text" class="form-input" id="projectNameInput" required>
+                </div>
+                <button type="submit" class="submit-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Contraseñas -->
+    <div class="modal" id="passwordsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Contraseñas de Administradores</h2>
+                <button class="close-btn" id="closePasswordsModal">&times;</button>
+            </div>
+            <div id="passwordsList">
+                <!-- Las contraseñas se mostrarán aquí -->
+            </div>
+            <button class="submit-btn" id="generatePasswordsBtn" style="margin-top: 20px;">Generar Nuevas Contraseñas</button>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de almacenamiento local
+        const Storage = {
+            save: function(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    console.error('Error guardando en localStorage:', e);
+                    return false;
+                }
+            },
+
+            load: function(key) {
+                try {
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : null;
+                } catch (e) {
+                    console.error('Error cargando desde localStorage:', e);
+                    return null;
+                }
+            },
+
+            saveImage: function(key, file, callback) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (Storage.save(key, e.target.result)) {
+                        callback(e.target.result);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Generar contraseñas aleatorias
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // Datos iniciales de la aplicación - TODOS EN BLANCO
+        const defaultAdmins = {
+            admin1: { 
+                id: 'admin1', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
+            },
+            admin2: { 
+                id: 'admin2', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
+            },
+            admin3: { 
+                id: 'admin3', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
+            }
+        };
+
+        const defaultTasks = []; // Sin tareas de ejemplo
+
+        const defaultComments = []; // Sin comentarios de ejemplo
+
+        const defaultProject = {
+            name: "LS Roleplay",
+            logo: ""
+        };
+
+        // Cargar datos o usar valores por defecto
+        let admins = Storage.load('project_admins') || defaultAdmins;
+        let tasks = Storage.load('project_tasks') || defaultTasks;
+        let comments = Storage.load('project_comments') || defaultComments;
+        let project = Storage.load('project_info') || defaultProject;
+
+        // Estado de la aplicación
+        let currentUser = null;
+
+        // Elementos del DOM
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginForm = document.getElementById('loginForm');
+        const adminSelect = document.getElementById('adminSelect');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const taskList = document.getElementById('taskList');
+        const personalTasks = document.getElementById('personalTasks');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskModal = document.getElementById('taskModal');
+        const closeTaskModal = document.getElementById('closeTaskModal');
+        const taskForm = document.getElementById('taskForm');
+        const taskAssignee = document.getElementById('taskAssignee');
+        const commentsList = document.getElementById('commentsList');
+        const addCommentBtn = document.getElementById('addCommentBtn');
+        const commentModal = document.getElementById('commentModal');
+        const closeCommentModal = document.getElementById('closeCommentModal');
+        const commentForm = document.getElementById('commentForm');
+        const commentContent = document.getElementById('commentContent');
+        const adminGrid = document.getElementById('adminGrid');
+        const adminModal = document.getElementById('adminModal');
+        const closeAdminModal = document.getElementById('closeAdminModal');
+        const adminForm = document.getElementById('adminForm');
+        const editAdminId = document.getElementById('editAdminId');
+        const editAdminName = document.getElementById('editAdminName');
+        const editAdminRole = document.getElementById('editAdminRole');
+        const editAdminBio = document.getElementById('editAdminBio');
+        const editAdminSkills = document.getElementById('editAdminSkills');
+        const adminAvatarInput = document.getElementById('adminAvatarInput');
+        const adminAvatarPreview = document.getElementById('adminAvatarPreview');
+        const logoModal = document.getElementById('logoModal');
+        const closeLogoModal = document.getElementById('closeLogoModal');
+        const logoForm = document.getElementById('logoForm');
+        const logoInput = document.getElementById('logoInput');
+        const logoPreview = document.getElementById('logoPreview');
+        const projectLogoElement = document.getElementById('projectLogo');
+        const projectNameElement = document.getElementById('projectName');
+        const projectNameInput = document.getElementById('projectNameInput');
+        const editLogoBtn = document.getElementById('editLogoBtn');
+        const passwordsModal = document.getElementById('passwordsModal');
+        const closePasswordsModal = document.getElementById('closePasswordsModal');
+        const passwordsList = document.getElementById('passwordsList');
+        const generatePasswordsBtn = document.getElementById('generatePasswordsBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Funciones
+        function saveData() {
+            Storage.save('project_admins', admins);
+            Storage.save('project_tasks', tasks);
+            Storage.save('project_comments', comments);
+            Storage.save('project_info', project);
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>No hay tareas creadas</p>
+                        <p>Crea la primera tarea para comenzar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            tasks.forEach(task => {
+                const assignee = task.assignee ? admins[task.assignee] : null;
+                
+                const taskItem = document.createElement('li');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-assignee">
+                            ${assignee ? `Asignado a: ${assignee.name}` : 'Sin asignar'}
+                            ${task.description ? `<br><small>${task.description}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        ${currentUser && (!task.assignee || task.assignee === currentUser) ? 
+                            `<button class="action-btn assign-btn" data-id="${task.id}" title="${task.assignee === currentUser ? 'Tarea asignada' : 'Asignarme esta tarea'}">
+                                <i class="fas fa-user${task.assignee === currentUser ? '-check' : ''}"></i>
+                            </button>` : ''}
+                        ${currentUser ? 
+                            `<button class="action-btn delete-btn" data-id="${task.id}" title="Eliminar tarea">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
+                    </div>
+                `;
+                
+                taskList.appendChild(taskItem);
+            });
+            
+            document.querySelectorAll('.assign-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    assignTaskToMe(taskId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    deleteTask(taskId);
+                });
+            });
+
+            renderPersonalTasks();
+        }
+
+        function renderPersonalTasks() {
+            personalTasks.innerHTML = '';
+            
+            if (!currentUser) {
+                personalTasks.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user"></i>
+                        <p>Inicia sesión para ver tus tareas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const userTasks = tasks.filter(task => task.assignee === currentUser);
+            
+            if (userTasks.length === 0) {
+                personalTasks.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No tienes tareas asignadas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            userTasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-assignee">
+                            ${task.description ? `<small>${task.description}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="action-btn complete-btn" data-id="${task.id}" title="Marcar como completada">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="action-btn unassign-btn" data-id="${task.id}" title="Liberar tarea">
+                            <i class="fas fa-user-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                personalTasks.appendChild(taskItem);
+            });
+            
+            document.querySelectorAll('.complete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    completeTask(taskId);
+                });
+            });
+
+            document.querySelectorAll('.unassign-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    unassignTask(taskId);
+                });
+            });
+        }
+
+        function renderComments() {
+            commentsList.innerHTML = '';
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>No hay comentarios todavía perri.</p>
+                        <p>Tira alguno si tenés.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedComments = [...comments].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedComments.forEach(comment => {
+                const commentItem = document.createElement('div');
+                commentItem.className = 'comment-item';
+                commentItem.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-author">${comment.author}</div>
+                        <div class="comment-date">${new Date(comment.date).toLocaleDateString()}</div>
+                    </div>
+                    <div class="comment-content">${comment.content}</div>
+                    ${currentUser === comment.authorId ? `
+                    <div class="comment-actions">
+                        <button class="action-btn delete-comment-btn" data-id="${comment.id}" title="Eliminar comentario">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                `;
+                
+                commentsList.appendChild(commentItem);
+            });
+            
+            document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const commentId = this.getAttribute('data-id');
+                    deleteComment(commentId);
+                });
+            });
+        }
+
+        function renderAdmins() {
+            adminGrid.innerHTML = '';
+            
+            Object.values(admins).forEach(admin => {
+                const adminCard = document.createElement('div');
+                adminCard.className = 'admin-card';
+                adminCard.innerHTML = `
+                    ${currentUser === admin.id ? `<button class="admin-edit" data-id="${admin.id}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>` : ''}
+                    <div class="admin-header">
+                        <div class="admin-avatar">
+                            ${admin.avatar ? `<img src="${admin.avatar}" alt="${admin.name}">` : `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`}
+                        </div>
+                        <div>
+                            <div class="admin-name">${admin.name || 'Sin nombre'}</div>
+                            <div class="admin-role">${admin.role || 'Sin rol'}</div>
+                        </div>
+                    </div>
+                    <p>${admin.bio || 'Sin descripción'}</p>
+                    <div class="admin-skills">
+                        ${admin.skills && admin.skills.length > 0 ? 
+                            admin.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            '<span class="skill-tag">Sin habilidades</span>'}
+                    </div>
+                `;
+                
+                adminGrid.appendChild(adminCard);
+            });
+            
+            document.querySelectorAll('.admin-edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const adminId = this.getAttribute('data-id');
+                    openAdminEdit(adminId);
+                });
+            });
+        }
+
+        function populateAdminSelect() {
+            adminSelect.innerHTML = '<option value="">-- Selecciona un administrador --</option>';
+            taskAssignee.innerHTML = '<option value="">-- Sin asignar --</option>';
+            
+            Object.values(admins).forEach(admin => {
+                const option = document.createElement('option');
+                option.value = admin.id;
+                option.textContent = admin.name || `Administrador ${admin.id}`;
+                adminSelect.appendChild(option);
+                
+                const assignOption = option.cloneNode(true);
+                taskAssignee.appendChild(assignOption);
+            });
+            
+            updatePasswordPlaceholder();
+        }
+
+        function updatePasswordPlaceholder() {
+            const passwordInput = document.getElementById('password');
+            const selectedAdmin = adminSelect.value;
+            
+            if (selectedAdmin && admins[selectedAdmin] && !admins[selectedAdmin].password) {
+                passwordInput.placeholder = 'Establecer nueva contraseña';
+            } else {
+                passwordInput.placeholder = 'Ingresa tu contraseña';
+            }
+        }
+
+        function renderPasswords() {
+            passwordsList.innerHTML = '';
+            
+            Object.values(admins).forEach(admin => {
+                const passwordItem = document.createElement('div');
+                passwordItem.className = 'password-display';
+                passwordItem.innerHTML = `
+                    <div>
+                        <strong>${admin.name || `Administrador ${admin.id}`}:</strong> ${admin.password || 'Sin contraseña establecida'}
+                    </div>
+                    ${admin.password ? `<button class="copy-btn" data-password="${admin.password}">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>` : ''}
+                `;
+                
+                passwordsList.appendChild(passwordItem);
+            });
+            
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const password = this.getAttribute('data-password');
+                    navigator.clipboard.writeText(password).then(() => {
+                        alert('Contraseña copiada al portapapeles');
+                    });
+                });
+            });
+        }
+
+        function updateProjectInfo() {
+            projectNameElement.textContent = project.name;
+            
+            const watermarkLogo = document.getElementById('watermarkLogo');
+            if (project.logo) {
+                watermarkLogo.innerHTML = `<img src="${project.logo}" alt="${project.name}">`;
+            } else {
+                watermarkLogo.innerHTML = '<span>LS</span>';
+            }
+        }
+
+        function assignTaskToMe(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].assignee = currentUser;
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function unassignTask(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].assignee = "";
+                saveData();
+                renderTasks();
+                alert('Tarea liberada. Ahora está disponible para ser asignada a otro administrador.');
+            }
+        }
+
+        function completeTask(taskId) {
+            if (confirm('¿Marcar esta tarea como completada?')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function addTask(title, description, assignee) {
+            const newTask = {
+                id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
+                title,
+                description,
+                assignee,
+                completed: false
+            };
+            
+            tasks.push(newTask);
+            saveData();
+            renderTasks();
+            taskModal.style.display = 'none';
+            taskForm.reset();
+        }
+
+        function addComment(content) {
+            const newComment = {
+                id: comments.length > 0 ? Math.max(...comments.map(c => c.id)) + 1 : 1,
+                content,
+                author: admins[currentUser].name || `Administrador ${currentUser}`,
+                authorId: currentUser,
+                date: new Date().toISOString()
+            };
+            
+            comments.push(newComment);
+            saveData();
+            renderComments();
+            commentModal.style.display = 'none';
+            commentForm.reset();
+        }
+
+        function deleteComment(commentId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                comments = comments.filter(comment => comment.id !== parseInt(commentId));
+                saveData();
+                renderComments();
+            }
+        }
+
+        function login(adminId, password) {
+            const admin = admins[adminId];
+            
+            if (admin && (!admin.password || admin.password === '')) {
+                admin.password = password;
+                saveData();
+                
+                currentUser = adminId;
+                updateUserInterface(admin);
+                loginModal.style.display = 'none';
+                loginForm.reset();
+                alert('¡Contraseña establecida correctamente!');
+                return;
+            }
+            
+            if (admin && admin.password === password) {
+                currentUser = adminId;
+                updateUserInterface(admin);
+                loginModal.style.display = 'none';
+                loginForm.reset();
+            } else {
+                alert('Contraseña incorrecta');
+            }
+        }
+
+        function updateUserInterface(admin) {
+            userName.textContent = admin.name || `Admin ${admin.id}`;
+            if (admin.avatar) {
+                userAvatar.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
+            } else {
+                userAvatar.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : 'A'}</span>`;
+            }
+            userInfo.style.display = 'flex';
+            loginBtn.textContent = 'Cerrar Sesión';
+            
+            renderTasks();
+            renderAdmins();
+            renderComments();
+        }
+
+        function logout() {
+            currentUser = null;
+            userInfo.style.display = 'none';
+            loginBtn.textContent = 'Iniciar Sesión';
+            userAvatar.innerHTML = '<span>U</span>';
+            renderTasks();
+            renderAdmins();
+            renderComments();
+        }
+
+        function openAdminEdit(adminId) {
+            const admin = admins[adminId];
+            
+            editAdminId.value = adminId;
+            editAdminName.value = admin.name || '';
+            editAdminRole.value = admin.role || '';
+            editAdminBio.value = admin.bio || '';
+            editAdminSkills.value = admin.skills ? admin.skills.join(', ') : '';
+            
+            if (admin.avatar) {
+                adminAvatarPreview.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
+            } else {
+                adminAvatarPreview.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`;
+            }
+            
+            adminModal.style.display = 'flex';
+        }
+
+        function updateAdmin(adminId, name, role, bio, skills, avatar) {
+            admins[adminId] = {
+                ...admins[adminId],
+                name,
+                role,
+                bio,
+                skills: skills ? skills.split(',').map(s => s.trim()) : [],
+                avatar
+            };
+            
+            saveData();
+            renderAdmins();
+            populateAdminSelect();
+            
+            if (currentUser === adminId) {
+                userName.textContent = name;
+                if (avatar) {
+                    userAvatar.innerHTML = `<img src="${avatar}" alt="${name}">`;
+                } else {
+                    userAvatar.innerHTML = `<span>${name.charAt(0)}</span>`;
+                }
+            }
+        }
+
+        function updateProjectLogo(logo, name) {
+            project.name = name;
+            project.logo = logo;
+            
+            saveData();
+            updateProjectInfo();
+            logoModal.style.display = 'none';
+        }
+
+        function generateNewPasswords() {
+            Object.values(admins).forEach(admin => {
+                admin.password = "";
+            });
+            saveData();
+            renderPasswords();
+            alert('Se han eliminado todas las contraseñas. Los usuarios deberán establecer nuevas contraseñas en su próximo inicio de sesión.');
+        }
+
+        function resetDatabase() {
+            if (confirm('¿Estás seguro de que quieres resetear toda la base de datos? Se perderán todos los datos.')) {
+                localStorage.removeItem('project_admins');
+                localStorage.removeItem('project_tasks');
+                localStorage.removeItem('project_comments');
+                localStorage.removeItem('project_info');
+                location.reload();
+            }
+        }
+
+        // Event Listeners
+        loginBtn.addEventListener('click', function() {
+            if (currentUser) {
+                logout();
+            } else {
+                loginModal.style.display = 'flex';
+            }
+        });
+
+        closeLoginModal.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+        });
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const adminId = adminSelect.value;
+            const password = document.getElementById('password').value;
+            
+            if (adminId && password) {
+                login(adminId, password);
+            }
+        });
+
+        adminSelect.addEventListener('change', updatePasswordPlaceholder);
+
+        addTaskBtn.addEventListener('click', function() {
+            if (currentUser) {
+                taskModal.style.display = 'flex';
+            } else {
+                alert('Debes iniciar sesión para agregar tareas');
+            }
+        });
+
+        closeTaskModal.addEventListener('click', function() {
+            taskModal.style.display = 'none';
+        });
+
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            
+            addTask(title, description, assignee);
+        });
+
+        addCommentBtn.addEventListener('click', function() {
+            if (currentUser) {
+                commentModal.style.display = 'flex';
+            } else {
+                alert('Debes iniciar sesión para agregar comentarios');
+            }
+        });
+
+        closeCommentModal.addEventListener('click', function() {
+            commentModal.style.display = 'none';
+        });
+
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('commentContent').value;
+            
+            if (content.trim()) {
+                addComment(content.trim());
+            }
+        });
+
+        closeAdminModal.addEventListener('click', function() {
+            adminModal.style.display = 'none';
+        });
+
+        adminForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const adminId = editAdminId.value;
+            const name = editAdminName.value;
+            const role = editAdminRole.value;
+            const bio = editAdminBio.value;
+            const skills = editAdminSkills.value;
+            const avatar = adminAvatarPreview.querySelector('img') ? 
+                adminAvatarPreview.querySelector('img').src : '';
+            
+            updateAdmin(adminId, name, role, bio, skills, avatar);
+            adminModal.style.display = 'none';
+        });
+
+        adminAvatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                Storage.saveImage(`admin_avatar_${editAdminId.value}`, file, function(avatarUrl) {
+                    adminAvatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Avatar">`;
+                });
+            }
+        });
+
+        closeLogoModal.addEventListener('click', function() {
+            logoModal.style.display = 'none';
+        });
+
+        logoForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = projectNameInput.value;
+            const logo = logoPreview.querySelector('img') ? 
+                logoPreview.querySelector('img').src : '';
+            
+            updateProjectLogo(logo, name);
+        });
+
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                Storage.saveImage('project_logo', file, function(logoUrl) {
+                    logoPreview.innerHTML = `<img src="${logoUrl}" alt="Logo del proyecto">`;
+                });
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.altKey && e.key === 'p') {
+                renderPasswords();
+                passwordsModal.style.display = 'flex';
+            }
+            if (e.ctrlKey && e.altKey && e.key === 'r') {
+                resetDatabase();
+            }
+        });
+
+        closePasswordsModal.addEventListener('click', function() {
+            passwordsModal.style.display = 'none';
+        });
+
+        generatePasswordsBtn.addEventListener('click', function() {
+            generateNewPasswords();
+        });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        window.addEventListener('click', function(e) {
+            if (e.target === loginModal) loginModal.style.display = 'none';
+            if (e.target === taskModal) taskModal.style.display = 'none';
+            if (e.target === commentModal) commentModal.style.display = 'none';
+            if (e.target === adminModal) adminModal.style.display = 'none';
+            if (e.target === logoModal) logoModal.style.display = 'none';
+            if (e.target === passwordsModal) passwordsModal.style.display = 'none';
+        });
+
+        // Inicializar la aplicación
+        updateProjectInfo();
+        renderTasks();
+        renderAdmins();
+        renderComments();
+        populateAdminSelect();
+        
+        const hasEmptyPasswords = Object.values(admins).some(admin => !admin.password);
+        if (hasEmptyPasswords) {
+            setTimeout(() => {
+                alert('Los administradores deben establecer sus contraseñas en su primer inicio de sesión');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
