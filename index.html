@@ -1688,6 +1688,22 @@
         }
     }
 
+    // Event Listeners para los tabs
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remover clase active de todas las pestañas y contenidos
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Agregar clase active a la pestaña clickeada
+            this.classList.add('active');
+            
+            // Mostrar el contenido correspondiente
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+
     // Event Listeners (mantén todos los que ya tienes)
     loginBtn.addEventListener('click', function() {
         if (currentUser) {
@@ -1773,8 +1789,20 @@
         adminModal.style.display = 'none';
     });
 
-    // ... (mantén todos los demás event listeners)
+    // Event listeners para los modales adicionales
+    closeLogoModal.addEventListener('click', function() {
+        logoModal.style.display = 'none';
+    });
 
+    closePasswordsModal.addEventListener('click', function() {
+        passwordsModal.style.display = 'none';
+    });
+
+    generatePasswordsBtn.addEventListener('click', function() {
+        generateNewPasswords();
+    });
+
+    // Event listeners para atajos de teclado
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.altKey && e.key === 'p') {
             renderPasswords();
