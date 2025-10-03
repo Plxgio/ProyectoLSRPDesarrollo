@@ -958,863 +958,859 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
-<script>
-    // Configuración de Firebase - REEMPLAZA CON TUS DATOS REALES
-    const firebaseConfig = {
-  apiKey: "AIzaSyDXbcApRRT2oeMK-wFCV205-xp844Itkps",
-  authDomain: "proyectolsrpdesarrollo.firebaseapp.com",
-  projectId: "proyectolsrpdesarrollo",
-  storageBucket: "proyectolsrpdesarrollo.firebasestorage.app",
-  messagingSenderId: "30178692133",
-  appId: "1:30178692133:web:1c698fe4622662457183cc",
-  measurementId: "G-46QEBRPZLZ"
-    };
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXbcApRRT2oeMK-wFCV205-xp844Itkps",
+            authDomain: "proyectolsrpdesarrollo.firebaseapp.com",
+            projectId: "proyectolsrpdesarrollo",
+            storageBucket: "proyectolsrpdesarrollo.firebasestorage.app",
+            messagingSenderId: "30178692133",
+            appId: "1:30178692133:web:1c698fe4622662457183cc",
+            measurementId: "G-46QEBRPZLZ"
+        };
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-    // Sistema de almacenamiento con Firebase
-    const FirebaseStorage = {
-        // Guardar datos en Firestore
-        save: async function(collection, data) {
-            try {
-                await db.collection(collection).doc('data').set(data);
-                return true;
-            } catch (error) {
-                console.error('Error guardando en Firebase:', error);
-                return false;
+        // Sistema de almacenamiento con Firebase
+        const FirebaseStorage = {
+            save: async function(collection, data) {
+                try {
+                    await db.collection(collection).doc('data').set(data);
+                    return true;
+                } catch (error) {
+                    console.error('Error guardando en Firebase:', error);
+                    return false;
+                }
+            },
+
+            load: async function(collection) {
+                try {
+                    const doc = await db.collection(collection).doc('data').get();
+                    return doc.exists ? doc.data() : null;
+                } catch (error) {
+                    console.error('Error cargando desde Firebase:', error);
+                    return null;
+                }
+            },
+
+            onDataChange: function(collection, callback) {
+                return db.collection(collection).doc('data').onSnapshot((doc) => {
+                    if (doc.exists) {
+                        callback(doc.data());
+                    }
+                });
             }
-        },
+        };
 
-        // Cargar datos desde Firestore
-        load: async function(collection) {
-            try {
-                const doc = await db.collection(collection).doc('data').get();
-                return doc.exists ? doc.data() : null;
-            } catch (error) {
-                console.error('Error cargando desde Firebase:', error);
-                return null;
+        // Datos iniciales de la aplicación
+        const defaultAdmins = {
+            admin1: { 
+                id: 'admin1', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
+            },
+            admin2: { 
+                id: 'admin2', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
+            },
+            admin3: { 
+                id: 'admin3', 
+                name: "", 
+                avatar: "", 
+                role: "", 
+                bio: "",
+                skills: [],
+                password: ""
             }
-        },
+        };
 
-        // Escuchar cambios en tiempo real
-        onDataChange: function(collection, callback) {
-            return db.collection(collection).doc('data').onSnapshot((doc) => {
-                if (doc.exists) {
-                    callback(doc.data());
+        const defaultTasks = [];
+        const defaultComments = [];
+        const defaultProject = {
+            name: "LS Roleplay",
+            logo: ""
+        };
+
+        // Estado de la aplicación
+        let admins = defaultAdmins;
+        let tasks = defaultTasks;
+        let comments = defaultComments;
+        let project = defaultProject;
+        let currentUser = null;
+        let unsubscribeCallbacks = [];
+
+        // Elementos del DOM
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginForm = document.getElementById('loginForm');
+        const adminSelect = document.getElementById('adminSelect');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const taskList = document.getElementById('taskList');
+        const personalTasks = document.getElementById('personalTasks');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskModal = document.getElementById('taskModal');
+        const closeTaskModal = document.getElementById('closeTaskModal');
+        const taskForm = document.getElementById('taskForm');
+        const taskAssignee = document.getElementById('taskAssignee');
+        const commentsList = document.getElementById('commentsList');
+        const addCommentBtn = document.getElementById('addCommentBtn');
+        const commentModal = document.getElementById('commentModal');
+        const closeCommentModal = document.getElementById('closeCommentModal');
+        const commentForm = document.getElementById('commentForm');
+        const commentContent = document.getElementById('commentContent');
+        const adminGrid = document.getElementById('adminGrid');
+        const adminModal = document.getElementById('adminModal');
+        const closeAdminModal = document.getElementById('closeAdminModal');
+        const adminForm = document.getElementById('adminForm');
+        const editAdminId = document.getElementById('editAdminId');
+        const editAdminName = document.getElementById('editAdminName');
+        const editAdminRole = document.getElementById('editAdminRole');
+        const editAdminBio = document.getElementById('editAdminBio');
+        const editAdminSkills = document.getElementById('editAdminSkills');
+        const adminAvatarInput = document.getElementById('adminAvatarInput');
+        const adminAvatarPreview = document.getElementById('adminAvatarPreview');
+        const logoModal = document.getElementById('logoModal');
+        const closeLogoModal = document.getElementById('closeLogoModal');
+        const logoForm = document.getElementById('logoForm');
+        const logoInput = document.getElementById('logoInput');
+        const logoPreview = document.getElementById('logoPreview');
+        const projectNameElement = document.getElementById('projectName');
+        const projectNameInput = document.getElementById('projectNameInput');
+        const passwordsModal = document.getElementById('passwordsModal');
+        const closePasswordsModal = document.getElementById('closePasswordsModal');
+        const passwordsList = document.getElementById('passwordsList');
+        const generatePasswordsBtn = document.getElementById('generatePasswordsBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Funciones para manejar imágenes
+        function handleImageUpload(inputElement, previewElement) {
+            inputElement.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewElement.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
         }
-    };
 
-    // Generar contraseñas aleatorias
-    function generatePassword() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let password = '';
-        for (let i = 0; i < 8; i++) {
-            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        // Funciones de guardado
+        async function saveAdmins() {
+            await FirebaseStorage.save('admins', admins);
         }
-        return password;
-    }
 
-    // Datos iniciales de la aplicación - TODOS EN BLANCO
-    const defaultAdmins = {
-        admin1: { 
-            id: 'admin1', 
-            name: "", 
-            avatar: "", 
-            role: "", 
-            bio: "",
-            skills: [],
-            password: ""
-        },
-        admin2: { 
-            id: 'admin2', 
-            name: "", 
-            avatar: "", 
-            role: "", 
-            bio: "",
-            skills: [],
-            password: ""
-        },
-        admin3: { 
-            id: 'admin3', 
-            name: "", 
-            avatar: "", 
-            role: "", 
-            bio: "",
-            skills: [],
-            password: ""
+        async function saveTasks() {
+            await FirebaseStorage.save('tasks', tasks);
         }
-    };
 
-    const defaultTasks = [];
-    const defaultComments = [];
-    const defaultProject = {
-        name: "LS Roleplay",
-        logo: ""
-    };
-
-    // Estado de la aplicación
-    let admins = defaultAdmins;
-    let tasks = defaultTasks;
-    let comments = defaultComments;
-    let project = defaultProject;
-    let currentUser = null;
-    let unsubscribeCallbacks = [];
-
-    // Elementos del DOM (mantén todos los que ya tienes)
-    const loginBtn = document.getElementById('loginBtn');
-    const loginModal = document.getElementById('loginModal');
-    const closeLoginModal = document.getElementById('closeLoginModal');
-    const loginForm = document.getElementById('loginForm');
-    const adminSelect = document.getElementById('adminSelect');
-    const userInfo = document.getElementById('userInfo');
-    const userName = document.getElementById('userName');
-    const userAvatar = document.getElementById('userAvatar');
-    const taskList = document.getElementById('taskList');
-    const personalTasks = document.getElementById('personalTasks');
-    const addTaskBtn = document.getElementById('addTaskBtn');
-    const taskModal = document.getElementById('taskModal');
-    const closeTaskModal = document.getElementById('closeTaskModal');
-    const taskForm = document.getElementById('taskForm');
-    const taskAssignee = document.getElementById('taskAssignee');
-    const commentsList = document.getElementById('commentsList');
-    const addCommentBtn = document.getElementById('addCommentBtn');
-    const commentModal = document.getElementById('commentModal');
-    const closeCommentModal = document.getElementById('closeCommentModal');
-    const commentForm = document.getElementById('commentForm');
-    const commentContent = document.getElementById('commentContent');
-    const adminGrid = document.getElementById('adminGrid');
-    const adminModal = document.getElementById('adminModal');
-    const closeAdminModal = document.getElementById('closeAdminModal');
-    const adminForm = document.getElementById('adminForm');
-    const editAdminId = document.getElementById('editAdminId');
-    const editAdminName = document.getElementById('editAdminName');
-    const editAdminRole = document.getElementById('editAdminRole');
-    const editAdminBio = document.getElementById('editAdminBio');
-    const editAdminSkills = document.getElementById('editAdminSkills');
-    const adminAvatarInput = document.getElementById('adminAvatarInput');
-    const adminAvatarPreview = document.getElementById('adminAvatarPreview');
-    const logoModal = document.getElementById('logoModal');
-    const closeLogoModal = document.getElementById('closeLogoModal');
-    const logoForm = document.getElementById('logoForm');
-    const logoInput = document.getElementById('logoInput');
-    const logoPreview = document.getElementById('logoPreview');
-    const projectNameElement = document.getElementById('projectName');
-    const projectNameInput = document.getElementById('projectNameInput');
-    const passwordsModal = document.getElementById('passwordsModal');
-    const closePasswordsModal = document.getElementById('closePasswordsModal');
-    const passwordsList = document.getElementById('passwordsList');
-    const generatePasswordsBtn = document.getElementById('generatePasswordsBtn');
-    const tabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    // Funciones de guardado mejoradas
-    async function saveAllData() {
-        try {
-            await Promise.all([
-                FirebaseStorage.save('admins', admins),
-                FirebaseStorage.save('tasks', tasks),
-                FirebaseStorage.save('comments', comments),
-                FirebaseStorage.save('project', project)
-            ]);
-            console.log('Datos guardados en Firebase');
-        } catch (error) {
-            console.error('Error guardando datos:', error);
+        async function saveComments() {
+            await FirebaseStorage.save('comments', comments);
         }
-    }
 
-    async function saveAdmins() {
-        await FirebaseStorage.save('admins', admins);
-    }
-
-    async function saveTasks() {
-        await FirebaseStorage.save('tasks', tasks);
-    }
-
-    async function saveComments() {
-        await FirebaseStorage.save('comments', comments);
-    }
-
-    async function saveProject() {
-        await FirebaseStorage.save('project', project);
-    }
-
-    // Funciones de renderizado (mantén todas las que ya tienes)
-    function renderTasks() {
-        taskList.innerHTML = '';
-        
-        if (tasks.length === 0) {
-            taskList.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-tasks"></i>
-                    <p>No hay tareas creadas</p>
-                    <p>Crea la primera tarea para comenzar</p>
-                </div>
-            `;
-            return;
+        async function saveProject() {
+            await FirebaseStorage.save('project', project);
         }
-        
-        tasks.forEach(task => {
-            const assignee = task.assignee ? admins[task.assignee] : null;
+
+        // Funciones de renderizado
+        function renderTasks() {
+            taskList.innerHTML = '';
             
-            const taskItem = document.createElement('li');
-            taskItem.className = 'task-item';
-            taskItem.innerHTML = `
-                <div class="task-info">
-                    <div class="task-title">${task.title}</div>
-                    <div class="task-assignee">
-                        ${assignee ? `Asignado a: ${assignee.name}` : 'Sin asignar'}
-                        ${task.description ? `<br><small>${task.description}</small>` : ''}
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>No hay tareas creadas</p>
+                        <p>Crea la primera tarea para comenzar</p>
                     </div>
-                </div>
-                <div class="task-actions">
-                    ${currentUser && (!task.assignee || task.assignee === currentUser) ? 
-                        `<button class="action-btn assign-btn" data-id="${task.id}" title="${task.assignee === currentUser ? 'Tarea asignada' : 'Asignarme esta tarea'}">
-                            <i class="fas fa-user${task.assignee === currentUser ? '-check' : ''}"></i>
-                        </button>` : ''}
-                    ${currentUser ? 
-                        `<button class="action-btn delete-btn" data-id="${task.id}" title="Eliminar tarea">
-                            <i class="fas fa-trash"></i>
-                        </button>` : ''}
-                </div>
-            `;
+                `;
+                return;
+            }
             
-            taskList.appendChild(taskItem);
-        });
-        
-        document.querySelectorAll('.assign-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const taskId = parseInt(this.getAttribute('data-id'));
-                assignTaskToMe(taskId);
-            });
-        });
-        
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const taskId = parseInt(this.getAttribute('data-id'));
-                deleteTask(taskId);
-            });
-        });
-
-        renderPersonalTasks();
-    }
-
-    function renderPersonalTasks() {
-        personalTasks.innerHTML = '';
-        
-        if (!currentUser) {
-            personalTasks.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-user"></i>
-                    <p>Inicia sesión para ver tus tareas</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const userTasks = tasks.filter(task => task.assignee === currentUser);
-        
-        if (userTasks.length === 0) {
-            personalTasks.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-check-circle"></i>
-                    <p>No tienes tareas asignadas</p>
-                </div>
-            `;
-            return;
-        }
-        
-        userTasks.forEach(task => {
-            const taskItem = document.createElement('div');
-            taskItem.className = 'task-item';
-            taskItem.innerHTML = `
-                <div class="task-info">
-                    <div class="task-title">${task.title}</div>
-                    <div class="task-assignee">
-                        ${task.description ? `<small>${task.description}</small>` : ''}
+            tasks.forEach(task => {
+                const assignee = task.assignee ? admins[task.assignee] : null;
+                
+                const taskItem = document.createElement('li');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-assignee">
+                            ${assignee ? `Asignado a: ${assignee.name}` : 'Sin asignar'}
+                            ${task.description ? `<br><small>${task.description}</small>` : ''}
+                        </div>
                     </div>
-                </div>
-                <div class="task-actions">
-                    <button class="action-btn complete-btn" data-id="${task.id}" title="Marcar como completada">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="action-btn unassign-btn" data-id="${task.id}" title="Liberar tarea">
-                        <i class="fas fa-user-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            personalTasks.appendChild(taskItem);
-        });
-        
-        document.querySelectorAll('.complete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const taskId = parseInt(this.getAttribute('data-id'));
-                completeTask(taskId);
-            });
-        });
-
-        document.querySelectorAll('.unassign-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const taskId = parseInt(this.getAttribute('data-id'));
-                unassignTask(taskId);
-            });
-        });
-    }
-
-    function renderComments() {
-        commentsList.innerHTML = '';
-        
-        if (comments.length === 0) {
-            commentsList.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-comments"></i>
-                    <p>No hay comentarios aún</p>
-                    <p>Sé el primero en compartir una observación</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const sortedComments = [...comments].sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        sortedComments.forEach(comment => {
-            const commentItem = document.createElement('div');
-            commentItem.className = 'comment-item';
-            commentItem.innerHTML = `
-                <div class="comment-header">
-                    <div class="comment-author">${comment.author}</div>
-                    <div class="comment-date">${new Date(comment.date).toLocaleDateString()}</div>
-                </div>
-                <div class="comment-content">${comment.content}</div>
-                ${currentUser === comment.authorId ? `
-                <div class="comment-actions">
-                    <button class="action-btn delete-comment-btn" data-id="${comment.id}" title="Eliminar comentario">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                ` : ''}
-            `;
-            
-            commentsList.appendChild(commentItem);
-        });
-        
-        document.querySelectorAll('.delete-comment-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const commentId = this.getAttribute('data-id');
-                deleteComment(commentId);
-            });
-        });
-    }
-
-    function renderAdmins() {
-        adminGrid.innerHTML = '';
-        
-        Object.values(admins).forEach(admin => {
-            const adminCard = document.createElement('div');
-            adminCard.className = 'admin-card';
-            adminCard.innerHTML = `
-                ${currentUser === admin.id ? `<button class="admin-edit" data-id="${admin.id}">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>` : ''}
-                <div class="admin-header">
-                    <div class="admin-avatar">
-                        ${admin.avatar ? `<img src="${admin.avatar}" alt="${admin.name}">` : `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`}
+                    <div class="task-actions">
+                        ${currentUser && (!task.assignee || task.assignee === currentUser) ? 
+                            `<button class="action-btn assign-btn" data-id="${task.id}" title="${task.assignee === currentUser ? 'Tarea asignada' : 'Asignarme esta tarea'}">
+                                <i class="fas fa-user${task.assignee === currentUser ? '-check' : ''}"></i>
+                            </button>` : ''}
+                        ${currentUser ? 
+                            `<button class="action-btn delete-btn" data-id="${task.id}" title="Eliminar tarea">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
                     </div>
-                    <div>
-                        <div class="admin-name">${admin.name || 'Sin nombre'}</div>
-                        <div class="admin-role">${admin.role || 'Sin rol'}</div>
-                    </div>
-                </div>
-                <p>${admin.bio || 'Sin descripción'}</p>
-                <div class="admin-skills">
-                    ${admin.skills && admin.skills.length > 0 ? 
-                        admin.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
-                        '<span class="skill-tag">Sin habilidades</span>'}
-                </div>
-            `;
-            
-            adminGrid.appendChild(adminCard);
-        });
-        
-        document.querySelectorAll('.admin-edit').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const adminId = this.getAttribute('data-id');
-                openAdminEdit(adminId);
+                `;
+                
+                taskList.appendChild(taskItem);
             });
-        });
-    }
-
-    function populateAdminSelect() {
-        adminSelect.innerHTML = '<option value="">-- Selecciona un administrador --</option>';
-        taskAssignee.innerHTML = '<option value="">-- Sin asignar --</option>';
-        
-        Object.values(admins).forEach(admin => {
-            const option = document.createElement('option');
-            option.value = admin.id;
-            option.textContent = admin.name || `Administrador ${admin.id}`;
-            adminSelect.appendChild(option);
             
-            const assignOption = option.cloneNode(true);
-            taskAssignee.appendChild(assignOption);
-        });
-        
-        updatePasswordPlaceholder();
-    }
-
-    function updatePasswordPlaceholder() {
-        const passwordInput = document.getElementById('password');
-        const selectedAdmin = adminSelect.value;
-        
-        if (selectedAdmin && admins[selectedAdmin] && !admins[selectedAdmin].password) {
-            passwordInput.placeholder = 'Establecer nueva contraseña';
-        } else {
-            passwordInput.placeholder = 'Ingresa tu contraseña';
-        }
-    }
-
-    function renderPasswords() {
-        passwordsList.innerHTML = '';
-        
-        Object.values(admins).forEach(admin => {
-            const passwordItem = document.createElement('div');
-            passwordItem.className = 'password-display';
-            passwordItem.innerHTML = `
-                <div>
-                    <strong>${admin.name || `Administrador ${admin.id}`}:</strong> ${admin.password || 'Sin contraseña establecida'}
-                </div>
-                ${admin.password ? `<button class="copy-btn" data-password="${admin.password}">
-                    <i class="fas fa-copy"></i> Copiar
-                </button>` : ''}
-            `;
-            
-            passwordsList.appendChild(passwordItem);
-        });
-        
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const password = this.getAttribute('data-password');
-                navigator.clipboard.writeText(password).then(() => {
-                    alert('Contraseña copiada al portapapeles');
+            document.querySelectorAll('.assign-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    assignTaskToMe(taskId);
                 });
             });
-        });
-    }
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    deleteTask(taskId);
+                });
+            });
 
-    function updateProjectInfo() {
-        projectNameElement.textContent = project.name;
-        
-        const watermarkLogo = document.getElementById('watermarkLogo');
-        if (project.logo) {
-            watermarkLogo.innerHTML = `<img src="${project.logo}" alt="${project.name}">`;
-        } else {
-            watermarkLogo.innerHTML = '<span>LS</span>';
+            renderPersonalTasks();
         }
-    }
 
-    // Funciones de negocio actualizadas para Firebase
-    async function assignTaskToMe(taskId) {
-        const taskIndex = tasks.findIndex(task => task.id === taskId);
-        if (taskIndex !== -1) {
-            tasks[taskIndex].assignee = currentUser;
+        function renderPersonalTasks() {
+            personalTasks.innerHTML = '';
+            
+            if (!currentUser) {
+                personalTasks.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user"></i>
+                        <p>Inicia sesión para ver tus tareas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const userTasks = tasks.filter(task => task.assignee === currentUser);
+            
+            if (userTasks.length === 0) {
+                personalTasks.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <p>No tienes tareas asignadas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            userTasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-assignee">
+                            ${task.description ? `<small>${task.description}</small>` : ''}
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="action-btn complete-btn" data-id="${task.id}" title="Marcar como completada">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="action-btn unassign-btn" data-id="${task.id}" title="Liberar tarea">
+                            <i class="fas fa-user-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                personalTasks.appendChild(taskItem);
+            });
+            
+            document.querySelectorAll('.complete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    completeTask(taskId);
+                });
+            });
+
+            document.querySelectorAll('.unassign-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskId = parseInt(this.getAttribute('data-id'));
+                    unassignTask(taskId);
+                });
+            });
+        }
+
+        function renderComments() {
+            commentsList.innerHTML = '';
+            
+            if (comments.length === 0) {
+                commentsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>No hay comentarios aún</p>
+                        <p>Sé el primero en compartir una observación</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedComments = [...comments].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedComments.forEach(comment => {
+                const commentItem = document.createElement('div');
+                commentItem.className = 'comment-item';
+                commentItem.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-author">${comment.author}</div>
+                        <div class="comment-date">${new Date(comment.date).toLocaleDateString()}</div>
+                    </div>
+                    <div class="comment-content">${comment.content}</div>
+                    ${currentUser === comment.authorId ? `
+                    <div class="comment-actions">
+                        <button class="action-btn delete-comment-btn" data-id="${comment.id}" title="Eliminar comentario">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                `;
+                
+                commentsList.appendChild(commentItem);
+            });
+            
+            document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const commentId = this.getAttribute('data-id');
+                    deleteComment(commentId);
+                });
+            });
+        }
+
+        function renderAdmins() {
+            adminGrid.innerHTML = '';
+            
+            Object.values(admins).forEach(admin => {
+                const adminCard = document.createElement('div');
+                adminCard.className = 'admin-card';
+                adminCard.innerHTML = `
+                    ${currentUser === admin.id ? `<button class="admin-edit" data-id="${admin.id}">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>` : ''}
+                    <div class="admin-header">
+                        <div class="admin-avatar">
+                            ${admin.avatar ? `<img src="${admin.avatar}" alt="${admin.name}">` : `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`}
+                        </div>
+                        <div>
+                            <div class="admin-name">${admin.name || 'Sin nombre'}</div>
+                            <div class="admin-role">${admin.role || 'Sin rol'}</div>
+                        </div>
+                    </div>
+                    <p>${admin.bio || 'Sin descripción'}</p>
+                    <div class="admin-skills">
+                        ${admin.skills && admin.skills.length > 0 ? 
+                            admin.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('') : 
+                            '<span class="skill-tag">Sin habilidades</span>'}
+                    </div>
+                `;
+                
+                adminGrid.appendChild(adminCard);
+            });
+            
+            document.querySelectorAll('.admin-edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const adminId = this.getAttribute('data-id');
+                    openAdminEdit(adminId);
+                });
+            });
+        }
+
+        function populateAdminSelect() {
+            adminSelect.innerHTML = '<option value="">-- Selecciona un administrador --</option>';
+            taskAssignee.innerHTML = '<option value="">-- Sin asignar --</option>';
+            
+            Object.values(admins).forEach(admin => {
+                const option = document.createElement('option');
+                option.value = admin.id;
+                option.textContent = admin.name || `Administrador ${admin.id}`;
+                adminSelect.appendChild(option);
+                
+                const assignOption = option.cloneNode(true);
+                taskAssignee.appendChild(assignOption);
+            });
+            
+            updatePasswordPlaceholder();
+        }
+
+        function updatePasswordPlaceholder() {
+            const passwordInput = document.getElementById('password');
+            const selectedAdmin = adminSelect.value;
+            
+            if (selectedAdmin && admins[selectedAdmin] && !admins[selectedAdmin].password) {
+                passwordInput.placeholder = 'Establecer nueva contraseña';
+            } else {
+                passwordInput.placeholder = 'Ingresa tu contraseña';
+            }
+        }
+
+        function renderPasswords() {
+            passwordsList.innerHTML = '';
+            
+            Object.values(admins).forEach(admin => {
+                const passwordItem = document.createElement('div');
+                passwordItem.className = 'password-display';
+                passwordItem.innerHTML = `
+                    <div>
+                        <strong>${admin.name || `Administrador ${admin.id}`}:</strong> ${admin.password || 'Sin contraseña establecida'}
+                    </div>
+                    ${admin.password ? `<button class="copy-btn" data-password="${admin.password}">
+                        <i class="fas fa-copy"></i> Copiar
+                    </button>` : ''}
+                `;
+                
+                passwordsList.appendChild(passwordItem);
+            });
+            
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const password = this.getAttribute('data-password');
+                    navigator.clipboard.writeText(password).then(() => {
+                        alert('Contraseña copiada al portapapeles');
+                    });
+                });
+            });
+        }
+
+        function updateProjectInfo() {
+            projectNameElement.textContent = project.name;
+            
+            const watermarkLogo = document.getElementById('watermarkLogo');
+            if (project.logo) {
+                watermarkLogo.innerHTML = `<img src="${project.logo}" alt="${project.name}">`;
+            } else {
+                watermarkLogo.innerHTML = '<span>LS</span>';
+            }
+        }
+
+        // Funciones de negocio
+        async function assignTaskToMe(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].assignee = currentUser;
+                await saveTasks();
+                renderTasks();
+            }
+        }
+
+        async function unassignTask(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].assignee = "";
+                await saveTasks();
+                renderTasks();
+                alert('Tarea liberada. Ahora está disponible para ser asignada a otro administrador.');
+            }
+        }
+
+        async function completeTask(taskId) {
+            if (confirm('¿Marcar esta tarea como completada?')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                await saveTasks();
+                renderTasks();
+            }
+        }
+
+        async function deleteTask(taskId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                await saveTasks();
+                renderTasks();
+            }
+        }
+
+        async function addTask(title, description, assignee) {
+            const newTask = {
+                id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
+                title,
+                description,
+                assignee,
+                completed: false
+            };
+            
+            tasks.push(newTask);
             await saveTasks();
             renderTasks();
+            taskModal.style.display = 'none';
+            taskForm.reset();
         }
-    }
 
-    async function unassignTask(taskId) {
-        const taskIndex = tasks.findIndex(task => task.id === taskId);
-        if (taskIndex !== -1) {
-            tasks[taskIndex].assignee = "";
-            await saveTasks();
-            renderTasks();
-            alert('Tarea liberada. Ahora está disponible para ser asignada a otro administrador.');
-        }
-    }
-
-    async function completeTask(taskId) {
-        if (confirm('¿Marcar esta tarea como completada?')) {
-            tasks = tasks.filter(task => task.id !== taskId);
-            await saveTasks();
-            renderTasks();
-        }
-    }
-
-    async function deleteTask(taskId) {
-        if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
-            tasks = tasks.filter(task => task.id !== taskId);
-            await saveTasks();
-            renderTasks();
-        }
-    }
-
-    async function addTask(title, description, assignee) {
-        const newTask = {
-            id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
-            title,
-            description,
-            assignee,
-            completed: false
-        };
-        
-        tasks.push(newTask);
-        await saveTasks();
-        renderTasks();
-        taskModal.style.display = 'none';
-        taskForm.reset();
-    }
-
-    async function addComment(content) {
-        const newComment = {
-            id: comments.length > 0 ? Math.max(...comments.map(c => c.id)) + 1 : 1,
-            content,
-            author: admins[currentUser].name || `Administrador ${currentUser}`,
-            authorId: currentUser,
-            date: new Date().toISOString()
-        };
-        
-        comments.push(newComment);
-        await saveComments();
-        renderComments();
-        commentModal.style.display = 'none';
-        commentForm.reset();
-    }
-
-    async function deleteComment(commentId) {
-        if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
-            comments = comments.filter(comment => comment.id !== parseInt(commentId));
+        async function addComment(content) {
+            const newComment = {
+                id: comments.length > 0 ? Math.max(...comments.map(c => c.id)) + 1 : 1,
+                content,
+                author: admins[currentUser].name || `Administrador ${currentUser}`,
+                authorId: currentUser,
+                date: new Date().toISOString()
+            };
+            
+            comments.push(newComment);
             await saveComments();
             renderComments();
+            commentModal.style.display = 'none';
+            commentForm.reset();
         }
-    }
 
-    async function login(adminId, password) {
-        const admin = admins[adminId];
-        
-        if (admin && (!admin.password || admin.password === '')) {
-            admin.password = password;
-            await saveAdmins();
+        async function deleteComment(commentId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                comments = comments.filter(comment => comment.id !== parseInt(commentId));
+                await saveComments();
+                renderComments();
+            }
+        }
+
+        async function login(adminId, password) {
+            const admin = admins[adminId];
             
-            currentUser = adminId;
-            updateUserInterface(admin);
-            loginModal.style.display = 'none';
-            loginForm.reset();
-            alert('¡Contraseña establecida correctamente!');
-            return;
-        }
-        
-        if (admin && admin.password === password) {
-            currentUser = adminId;
-            updateUserInterface(admin);
-            loginModal.style.display = 'none';
-            loginForm.reset();
-        } else {
-            alert('Contraseña incorrecta');
-        }
-    }
-
-    function updateUserInterface(admin) {
-        userName.textContent = admin.name || `Admin ${admin.id}`;
-        if (admin.avatar) {
-            userAvatar.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
-        } else {
-            userAvatar.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : 'A'}</span>`;
-        }
-        userInfo.style.display = 'flex';
-        loginBtn.textContent = 'Cerrar Sesión';
-        
-        renderTasks();
-        renderAdmins();
-        renderComments();
-    }
-
-    function logout() {
-        currentUser = null;
-        userInfo.style.display = 'none';
-        loginBtn.textContent = 'Iniciar Sesión';
-        userAvatar.innerHTML = '<span>U</span>';
-        renderTasks();
-        renderAdmins();
-        renderComments();
-    }
-
-    function openAdminEdit(adminId) {
-        const admin = admins[adminId];
-        
-        editAdminId.value = adminId;
-        editAdminName.value = admin.name || '';
-        editAdminRole.value = admin.role || '';
-        editAdminBio.value = admin.bio || '';
-        editAdminSkills.value = admin.skills ? admin.skills.join(', ') : '';
-        
-        if (admin.avatar) {
-            adminAvatarPreview.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
-        } else {
-            adminAvatarPreview.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`;
-        }
-        
-        adminModal.style.display = 'flex';
-    }
-
-    async function updateAdmin(adminId, name, role, bio, skills, avatar) {
-        admins[adminId] = {
-            ...admins[adminId],
-            name,
-            role,
-            bio,
-            skills: skills ? skills.split(',').map(s => s.trim()) : [],
-            avatar
-        };
-        
-        await saveAdmins();
-        renderAdmins();
-        populateAdminSelect();
-        
-        if (currentUser === adminId) {
-            userName.textContent = name;
-            if (avatar) {
-                userAvatar.innerHTML = `<img src="${avatar}" alt="${name}">`;
+            if (admin && (!admin.password || admin.password === '')) {
+                admin.password = password;
+                await saveAdmins();
+                
+                currentUser = adminId;
+                updateUserInterface(admin);
+                loginModal.style.display = 'none';
+                loginForm.reset();
+                alert('¡Contraseña establecida correctamente!');
+                return;
+            }
+            
+            if (admin && admin.password === password) {
+                currentUser = adminId;
+                updateUserInterface(admin);
+                loginModal.style.display = 'none';
+                loginForm.reset();
             } else {
-                userAvatar.innerHTML = `<span>${name.charAt(0)}</span>`;
+                alert('Contraseña incorrecta');
             }
         }
-    }
 
-    async function updateProjectLogo(logo, name) {
-        project.name = name;
-        project.logo = logo;
-        
-        await saveProject();
-        updateProjectInfo();
-        logoModal.style.display = 'none';
-    }
-
-    async function generateNewPasswords() {
-        Object.values(admins).forEach(admin => {
-            admin.password = "";
-        });
-        await saveAdmins();
-        renderPasswords();
-        alert('Se han eliminado todas las contraseñas. Los usuarios deberán establecer nuevas contraseñas en su próximo inicio de sesión.');
-    }
-
-    async function resetDatabase() {
-        if (confirm('¿Estás seguro de que quieres resetear toda la base de datos? Se perderán todos los datos.')) {
-            try {
-                await Promise.all([
-                    FirebaseStorage.save('admins', defaultAdmins),
-                    FirebaseStorage.save('tasks', defaultTasks),
-                    FirebaseStorage.save('comments', defaultComments),
-                    FirebaseStorage.save('project', defaultProject)
-                ]);
-                location.reload();
-            } catch (error) {
-                alert('Error al resetear la base de datos: ' + error.message);
+        function updateUserInterface(admin) {
+            userName.textContent = admin.name || `Admin ${admin.id}`;
+            if (admin.avatar) {
+                userAvatar.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
+            } else {
+                userAvatar.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : 'A'}</span>`;
             }
-        }
-    }
-
-    // Inicialización con Firebase
-    async function initializeApp() {
-        try {
-            // Cargar datos iniciales desde Firebase
-            const [adminsData, tasksData, commentsData, projectData] = await Promise.all([
-                FirebaseStorage.load('admins'),
-                FirebaseStorage.load('tasks'),
-                FirebaseStorage.load('comments'),
-                FirebaseStorage.load('project')
-            ]);
-
-            // Usar datos de Firebase o valores por defecto
-            admins = adminsData || defaultAdmins;
-            tasks = tasksData || defaultTasks;
-            comments = commentsData || defaultComments;
-            project = projectData || defaultProject;
-
-            // Configurar listeners en tiempo real
-            unsubscribeCallbacks.push(
-                FirebaseStorage.onDataChange('admins', (data) => {
-                    if (JSON.stringify(admins) !== JSON.stringify(data)) {
-                        admins = data;
-                        renderAdmins();
-                        populateAdminSelect();
-                        if (currentUser) {
-                            updateUserInterface(admins[currentUser]);
-                        }
-                    }
-                }),
-                FirebaseStorage.onDataChange('tasks', (data) => {
-                    if (JSON.stringify(tasks) !== JSON.stringify(data)) {
-                        tasks = data || [];
-                        renderTasks();
-                    }
-                }),
-                FirebaseStorage.onDataChange('comments', (data) => {
-                    if (JSON.stringify(comments) !== JSON.stringify(data)) {
-                        comments = data || [];
-                        renderComments();
-                    }
-                }),
-                FirebaseStorage.onDataChange('project', (data) => {
-                    if (JSON.stringify(project) !== JSON.stringify(data)) {
-                        project = data;
-                        updateProjectInfo();
-                    }
-                })
-            );
-
-            // Renderizar interfaz
-            updateProjectInfo();
+            userInfo.style.display = 'flex';
+            loginBtn.textContent = 'Cerrar Sesión';
+            
             renderTasks();
             renderAdmins();
             renderComments();
-            populateAdminSelect();
+        }
 
-            console.log('Aplicación inicializada con Firebase');
-
-        } catch (error) {
-            console.error('Error inicializando la aplicación:', error);
-            // Fallback a datos locales
-            updateProjectInfo();
+        function logout() {
+            currentUser = null;
+            userInfo.style.display = 'none';
+            loginBtn.textContent = 'Iniciar Sesión';
+            userAvatar.innerHTML = '<span>U</span>';
             renderTasks();
             renderAdmins();
             renderComments();
+        }
+
+        function openAdminEdit(adminId) {
+            const admin = admins[adminId];
+            
+            editAdminId.value = adminId;
+            editAdminName.value = admin.name || '';
+            editAdminRole.value = admin.role || '';
+            editAdminBio.value = admin.bio || '';
+            editAdminSkills.value = admin.skills ? admin.skills.join(', ') : '';
+            
+            if (admin.avatar) {
+                adminAvatarPreview.innerHTML = `<img src="${admin.avatar}" alt="${admin.name}">`;
+            } else {
+                adminAvatarPreview.innerHTML = `<span>${admin.name ? admin.name.charAt(0) : '?'}</span>`;
+            }
+            
+            adminModal.style.display = 'flex';
+        }
+
+        async function updateAdmin(adminId, name, role, bio, skills, avatar) {
+            const avatarSrc = adminAvatarPreview.querySelector('img') ? 
+                adminAvatarPreview.querySelector('img').src : '';
+                
+            admins[adminId] = {
+                ...admins[adminId],
+                name,
+                role,
+                bio,
+                skills: skills ? skills.split(',').map(s => s.trim()) : [],
+                avatar: avatarSrc
+            };
+            
+            await saveAdmins();
+            renderAdmins();
             populateAdminSelect();
-        }
-    }
-
-    // Event Listeners para los tabs
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remover clase active de todas las pestañas y contenidos
-            tabs.forEach(t => t.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
             
-            // Agregar clase active a la pestaña clickeada
-            this.classList.add('active');
+            if (currentUser === adminId) {
+                userName.textContent = name;
+                if (avatarSrc) {
+                    userAvatar.innerHTML = `<img src="${avatarSrc}" alt="${name}">`;
+                } else {
+                    userAvatar.innerHTML = `<span>${name.charAt(0)}</span>`;
+                }
+            }
+        }
+
+        async function updateProjectLogo(logo, name) {
+            const logoSrc = logoPreview.querySelector('img') ? 
+                logoPreview.querySelector('img').src : '';
+                
+            project.name = name;
+            project.logo = logoSrc;
             
-            // Mostrar el contenido correspondiente
-            const tabId = this.getAttribute('data-tab');
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        });
-    });
-
-    // Event Listeners (mantén todos los que ya tienes)
-    loginBtn.addEventListener('click', function() {
-        if (currentUser) {
-            logout();
-        } else {
-            loginModal.style.display = 'flex';
+            await saveProject();
+            updateProjectInfo();
+            logoModal.style.display = 'none';
         }
-    });
 
-    closeLoginModal.addEventListener('click', function() {
-        loginModal.style.display = 'none';
-    });
-
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const adminId = adminSelect.value;
-        const password = document.getElementById('password').value;
-        
-        if (adminId && password) {
-            login(adminId, password);
-        }
-    });
-
-    adminSelect.addEventListener('change', updatePasswordPlaceholder);
-
-    addTaskBtn.addEventListener('click', function() {
-        if (currentUser) {
-            taskModal.style.display = 'flex';
-        } else {
-            alert('Debes iniciar sesión para agregar tareas');
-        }
-    });
-
-    closeTaskModal.addEventListener('click', function() {
-        taskModal.style.display = 'none';
-    });
-
-    taskForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const title = document.getElementById('taskTitle').value;
-        const description = document.getElementById('taskDescription').value;
-        const assignee = document.getElementById('taskAssignee').value;
-        
-        addTask(title, description, assignee);
-    });
-
-    addCommentBtn.addEventListener('click', function() {
-        if (currentUser) {
-            commentModal.style.display = 'flex';
-        } else {
-            alert('Debes iniciar sesión para agregar comentarios');
-        }
-    });
-
-    closeCommentModal.addEventListener('click', function() {
-        commentModal.style.display = 'none';
-    });
-
-    commentForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const content = document.getElementById('commentContent').value;
-        
-        if (content.trim()) {
-            addComment(content.trim());
-        }
-    });
-
-    closeAdminModal.addEventListener('click', function() {
-        adminModal.style.display = 'none';
-    });
-
-    adminForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const adminId = editAdminId.value;
-        const name = editAdminName.value;
-        const role = editAdminRole.value;
-        const bio = editAdminBio.value;
-        const skills = editAdminSkills.value;
-        const avatar = adminAvatarPreview.querySelector('img') ? 
-            adminAvatarPreview.querySelector('img').src : '';
-        
-        updateAdmin(adminId, name, role, bio, skills, avatar);
-        adminModal.style.display = 'none';
-    });
-
-    // Event listeners para los modales adicionales
-    closeLogoModal.addEventListener('click', function() {
-        logoModal.style.display = 'none';
-    });
-
-    closePasswordsModal.addEventListener('click', function() {
-        passwordsModal.style.display = 'none';
-    });
-
-    generatePasswordsBtn.addEventListener('click', function() {
-        generateNewPasswords();
-    });
-
-    // Event listeners para atajos de teclado
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.altKey && e.key === 'p') {
+        async function generateNewPasswords() {
+            Object.values(admins).forEach(admin => {
+                admin.password = "";
+            });
+            await saveAdmins();
             renderPasswords();
-            passwordsModal.style.display = 'flex';
+            alert('Se han eliminado todas las contraseñas. Los usuarios deberán establecer nuevas contraseñas en su próximo inicio de sesión.');
         }
-        if (e.ctrlKey && e.altKey && e.key === 'r') {
-            resetDatabase();
-        }
-    });
 
-    // Inicializar la aplicación cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', initializeApp);
-</script>
+        async function resetDatabase() {
+            if (confirm('¿Estás seguro de que quieres resetear toda la base de datos? Se perderán todos los datos.')) {
+                try {
+                    await Promise.all([
+                        FirebaseStorage.save('admins', defaultAdmins),
+                        FirebaseStorage.save('tasks', defaultTasks),
+                        FirebaseStorage.save('comments', defaultComments),
+                        FirebaseStorage.save('project', defaultProject)
+                    ]);
+                    location.reload();
+                } catch (error) {
+                    alert('Error al resetear la base de datos: ' + error.message);
+                }
+            }
+        }
+
+        // Inicialización con Firebase
+        async function initializeApp() {
+            try {
+                // Cargar datos iniciales desde Firebase
+                const [adminsData, tasksData, commentsData, projectData] = await Promise.all([
+                    FirebaseStorage.load('admins'),
+                    FirebaseStorage.load('tasks'),
+                    FirebaseStorage.load('comments'),
+                    FirebaseStorage.load('project')
+                ]);
+
+                // Usar datos de Firebase o valores por defecto
+                admins = adminsData || defaultAdmins;
+                tasks = tasksData || defaultTasks;
+                comments = commentsData || defaultComments;
+                project = projectData || defaultProject;
+
+                // Configurar listeners en tiempo real
+                unsubscribeCallbacks.push(
+                    FirebaseStorage.onDataChange('admins', (data) => {
+                        if (JSON.stringify(admins) !== JSON.stringify(data)) {
+                            admins = data;
+                            renderAdmins();
+                            populateAdminSelect();
+                            if (currentUser) {
+                                updateUserInterface(admins[currentUser]);
+                            }
+                        }
+                    }),
+                    FirebaseStorage.onDataChange('tasks', (data) => {
+                        if (JSON.stringify(tasks) !== JSON.stringify(data)) {
+                            tasks = data || [];
+                            renderTasks();
+                        }
+                    }),
+                    FirebaseStorage.onDataChange('comments', (data) => {
+                        if (JSON.stringify(comments) !== JSON.stringify(data)) {
+                            comments = data || [];
+                            renderComments();
+                        }
+                    }),
+                    FirebaseStorage.onDataChange('project', (data) => {
+                        if (JSON.stringify(project) !== JSON.stringify(data)) {
+                            project = data;
+                            updateProjectInfo();
+                        }
+                    })
+                );
+
+                // Renderizar interfaz
+                updateProjectInfo();
+                renderTasks();
+                renderAdmins();
+                renderComments();
+                populateAdminSelect();
+
+                console.log('Aplicación inicializada con Firebase');
+
+            } catch (error) {
+                console.error('Error inicializando la aplicación:', error);
+                // Fallback a datos locales
+                updateProjectInfo();
+                renderTasks();
+                renderAdmins();
+                renderComments();
+                populateAdminSelect();
+            }
+        }
+
+        // Event Listeners para los tabs
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Configurar manejo de imágenes
+        handleImageUpload(adminAvatarInput, adminAvatarPreview);
+        handleImageUpload(logoInput, logoPreview);
+
+        // Event Listeners
+        loginBtn.addEventListener('click', function() {
+            if (currentUser) {
+                logout();
+            } else {
+                loginModal.style.display = 'flex';
+            }
+        });
+
+        closeLoginModal.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+        });
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const adminId = adminSelect.value;
+            const password = document.getElementById('password').value;
+            
+            if (adminId && password) {
+                login(adminId, password);
+            }
+        });
+
+        adminSelect.addEventListener('change', updatePasswordPlaceholder);
+
+        addTaskBtn.addEventListener('click', function() {
+            if (currentUser) {
+                taskModal.style.display = 'flex';
+            } else {
+                alert('Debes iniciar sesión para agregar tareas');
+            }
+        });
+
+        closeTaskModal.addEventListener('click', function() {
+            taskModal.style.display = 'none';
+        });
+
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            
+            addTask(title, description, assignee);
+        });
+
+        addCommentBtn.addEventListener('click', function() {
+            if (currentUser) {
+                commentModal.style.display = 'flex';
+            } else {
+                alert('Debes iniciar sesión para agregar comentarios');
+            }
+        });
+
+        closeCommentModal.addEventListener('click', function() {
+            commentModal.style.display = 'none';
+        });
+
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = document.getElementById('commentContent').value;
+            
+            if (content.trim()) {
+                addComment(content.trim());
+            }
+        });
+
+        closeAdminModal.addEventListener('click', function() {
+            adminModal.style.display = 'none';
+        });
+
+        adminForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const adminId = editAdminId.value;
+            const name = editAdminName.value;
+            const role = editAdminRole.value;
+            const bio = editAdminBio.value;
+            const skills = editAdminSkills.value;
+            
+            updateAdmin(adminId, name, role, bio, skills);
+            adminModal.style.display = 'none';
+        });
+
+        closeLogoModal.addEventListener('click', function() {
+            logoModal.style.display = 'none';
+        });
+
+        logoForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = projectNameInput.value;
+            updateProjectLogo('', name);
+        });
+
+        closePasswordsModal.addEventListener('click', function() {
+            passwordsModal.style.display = 'none';
+        });
+
+        generatePasswordsBtn.addEventListener('click', function() {
+            generateNewPasswords();
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.altKey && e.key === 'p') {
+                renderPasswords();
+                passwordsModal.style.display = 'flex';
+            }
+            if (e.ctrlKey && e.altKey && e.key === 'r') {
+                resetDatabase();
+            }
+        });
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
 </body>
 </html>
